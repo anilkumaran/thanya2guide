@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Check Result | thanya2guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 to-white min-h-screen">
+  <nav class="bg-indigo-600 p-4 text-white flex justify-between">
+    <div class="font-bold text-lg">thanya2guide</div>
+    <div class="space-x-4">
+      <a href="index.html" class="hover:underline">Home</a>
+      <a href="results.html" class="hover:underline">Results</a>
+      <a href="contact.html" class="hover:underline">Contact Us</a>
+    </div>
+  </nav>
+
+  <div class="flex items-center justify-center py-16 px-4">
+    <div class="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full text-center">
+      <h1 class="text-2xl font-bold text-indigo-600 mb-4">🎓 Check Your Result</h1>
+      <input
+        type="text"
+        id="hallticket"
+        placeholder="Enter Hallticket Number"
+        class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-4"
+      />
+      <button
+        onclick="checkResult()"
+        class="bg-indigo-600 text-white px-6 py-2 rounded-xl w-full font-semibold hover:bg-indigo-700 transition"
+      >
+        Check Result
+      </button>
+
+      <div id="loading" class="mt-4 hidden">
+        <svg class="animate-spin mx-auto w-6 h-6 text-indigo-500" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"/>
+        </svg>
+      </div>
+
+      <div id="result" class="mt-6 text-sm text-gray-700"></div>
+    </div>
+  </div>
+
+  <script>
+    async function checkResult() {
+      const input = document.getElementById("hallticket");
+      const result = document.getElementById("result");
+      const loading = document.getElementById("loading");
+  
+      const hallticket = input.value.trim();
+      result.innerHTML = '';
+      if (!hallticket) {
+        result.innerText = "Please enter a hallticket number.";
+        return;
+      }
+  
+      loading.classList.remove('hidden');
+  
+      try {
+        const response = await fetch("https://f86iy15hch.execute-api.ap-south-1.amazonaws.com/prod/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ hallticket })
+        });
+  
+        const raw = await response.json(); // this is still a wrapper object
+        const parsed = typeof raw.body === "string" ? JSON.parse(raw.body) : raw;
+  
+        loading.classList.add('hidden');
+  
+        if (parsed.status === "not_found") {
+          result.innerHTML = `<p class="text-red-600 font-semibold">❌ Hallticket not found.</p>`;
+        } else if (parsed.status === "found" && parsed.data) {
+          let html = `<p class="text-green-700 font-semibold mb-2">✅ Result found!</p>`;
+          html += `<table class="w-full text-left border border-gray-300 rounded-lg overflow-hidden shadow-sm text-sm">`;
+          Object.entries(parsed.data).forEach(([key, val]) => {
+            html += `<tr class="border-t"><td class="font-medium px-3 py-2 bg-gray-50">${key}</td><td class="px-3 py-2">${val}</td></tr>`;
+          });
+          html += `</table>`;
+          result.innerHTML = html;
+        } else {
+          result.innerHTML = `<p class="text-yellow-600">⚠️ Unexpected response. Please try again.</p>`;
+        }
+      } catch (error) {
+        loading.classList.add('hidden');
+        result.innerHTML = `<p class="text-red-600 font-semibold">⚠️ Error checking result. Please try again later.</p>`;
+        console.error("Error:", error);
+      }
+    }
+  </script>
+  <div id="footer-placeholder"></div>
+  <script>
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
