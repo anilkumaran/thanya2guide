@@ -1,4 +1,8 @@
-*.pdf
+*.pdf*
+*venv*
+bin/input/
+bin/output/
+data/2025/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

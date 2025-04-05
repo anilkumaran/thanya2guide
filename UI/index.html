@@ -10,11 +10,11 @@
 
   <!-- Navbar -->
   <nav class="bg-indigo-600 p-4 text-white flex justify-between">
-    <div class="font-bold text-lg">thanya2guide</div>
+    <a href="index.html" class="font-bold text-lg hover:underline">thanya2guide</a>
     <div class="space-x-4">
-      <a href="index.html" class="hover:underline">Home</a>
-      <a href="results.html" class="hover:underline">Results</a>
-      <a href="contact.html" class="hover:underline">Contact Us</a>
+      <a href="index.html" class="nav-link hover:underline">Home</a>
+      <a href="results.html" class="nav-link hover:underline">Results</a>
+      <a href="contact-us.html" class="nav-link hover:underline">Contact Us</a>
     </div>
   </nav>
 
@@ -50,6 +50,15 @@
     </div>
   </div>
 
+  <!-- Highlight active nav link -->
+  <script>
+    const current = location.pathname.split("/").pop();
+    document.querySelectorAll(".nav-link").forEach(link => {
+      if (link.getAttribute("href") === current) {
+        link.classList.add("font-bold", "underline");
+      }
+    });
+  </script>
   <!-- Footer -->
   <div id="footer-placeholder"></div>
   <script>

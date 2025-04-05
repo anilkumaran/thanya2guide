@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us | thanya2guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 to-white flex flex-col min-h-screen">
+  <nav class="bg-indigo-600 p-4 text-white flex justify-between">
+    <a href="index.html" class="font-bold text-lg hover:underline">thanya2guide</a>
+    <div class="space-x-4">
+      <a href="index.html" class="nav-link hover:underline">Home</a>
+      <a href="results.html" class="nav-link hover:underline">Results</a>
+      <a href="contact-us.html" class="nav-link hover:underline">Contact Us</a>
+    </div>
+  </nav>
+
+  <div class="max-w-2xl mx-auto mt-12 p-6 bg-white shadow-xl rounded-2xl text-center">
+    <h1 class="text-3xl font-bold text-indigo-600 mb-6">📞 Contact Us</h1>
+    <p class="text-gray-700 mb-4">Have questions or feedback? Reach us through any of the platforms below:</p>
+
+    <div class="space-y-4 text-left">
+      <p><i class="fab fa-instagram text-pink-600 mr-2"></i> <strong>Instagram:</strong> <a href="https://instagram.com/thanya2guide" class="text-indigo-600 hover:underline" target="_blank">instagram.com/thanya2guide</a></p>
+      <p><i class="fab fa-telegram text-blue-500 mr-2"></i> <strong>Telegram:</strong> <a href="https://t.me/thanya2_guide" class="text-indigo-600 hover:underline" target="_blank">t.me/thanya2_guide</a></p>
+      <p><i class="fab fa-whatsapp text-green-500 mr-2"></i> <strong>WhatsApp:</strong> <a href="https://whatsapp.com/channel/0029VaAbo7b4NVisLv9yRM44" class="text-indigo-600 hover:underline" target="_blank">whatsapp.com/channel/...</a></p>
+      <p><i class="fas fa-blog text-gray-700 mr-2"></i> <strong>Blog:</strong> <a href="https://thanya2guide.blogspot.com" class="text-indigo-600 hover:underline" target="_blank">thanya2guide.blogspot.com</a></p>
+      <p><i class="fas fa-link text-purple-500 mr-2"></i> <strong>Beacons:</strong> <a href="https://beacons.ai/signup?c=thanya2guide" class="text-indigo-600 hover:underline" target="_blank">beacons.ai/signup?c=thanya2guide</a></p>
+    </div>
+
+    <div class="mt-8">
+      <h2 class="text-xl font-semibold mb-2 text-gray-800">🎥 YouTube Channel</h2>
+      <div class="relative pb-[56.25%] h-0 overflow-hidden rounded-xl shadow-md">
+        <iframe class="absolute top-0 left-0 w-full h-full"
+          src="https://www.youtube.com/embed/XG_Y7pq82cc"
+          title="YouTube Video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+      </div>
+      <a href="https://www.youtube.com/watch?v=XG_Y7pq82cc" target="_blank"
+         class="mt-3 inline-block text-indigo-600 font-semibold hover:underline">
+        🔗 Go to Channel & Subscribe
+      </a>
+    </div>
+
+    <div class="mt-10">
+      <button onclick="history.back()"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition">
+        ⬅️ Back
+      </button>
+    </div>
+  </div>
+
+    <!-- Highlight active nav link -->
+  <script>
+    const current = location.pathname.split("/").pop();
+    document.querySelectorAll(".nav-link").forEach(link => {
+      if (link.getAttribute("href") === current) {
+        link.classList.add("font-bold", "underline");
+      }
+    });
+  </script>
+  <div id="footer-placeholder"></div>
+  <script>
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      });
+  </script>
+
+</body>
+</html>
