@@ -1,74 +1,80 @@
 import boto3
 import json
-import bisect
 
 s3 = boto3.client('s3')
 BUCKET = 'thanya2guide'
-KEY = 'results.txt'
+KEY = '2025_tgcet_5th_class_results.json'
 
-cached_data = []  # Sorted list for binary search
+cached_data = {}
 
 def load_file():
     global cached_data
-    if not cached_data:
-        print("Loading data from S3...")
-        response = s3.get_object(Bucket=BUCKET, Key=KEY)
-        body = response['Body'].read().decode('utf-8')
+    if cached_data:
+        return
 
-        # Convert lines to integers & sort
-        cached_data = sorted(
-            int(line.strip()) for line in body.splitlines() if line.strip().isdigit()
-        )
+    print("🔄 Loading results file from S3...")
+    response = s3.get_object(Bucket=BUCKET, Key=KEY)
+    body = response['Body'].read().decode('utf-8')
+    parsed = json.loads(body)
 
-        print(f"Loaded {len(cached_data)} hallticket numbers.")
+    # If the JSON is a dictionary with halltickets as keys
+    if isinstance(parsed, dict):
+        cached_data.update(parsed)
+        print(f"✅ Loaded {len(cached_data)} students (dict format).")
+        return
 
-def binary_search(arr, target):
-    index = bisect.bisect_left(arr, target)
-    return index < len(arr) and arr[index] == target
+    # If the JSON is a list of rows
+    elif isinstance(parsed, list):
+        print("🔎 JSON is a list. Extracting hallticket field...")
+        for record in parsed:
+            hall_keys = [k for k in record.keys() if 'hall' in k.lower()]
+            if not hall_keys:
+                continue
+            key = hall_keys[0]
+            hallticket = str(record[key]).strip()
+            cached_data[hallticket] = record
+        print(f"✅ Loaded {len(cached_data)} students (list format).")
+    else:
+        print("❌ Invalid format. Expecting dict or list of dicts.")
 
 def return_response(resp):
-    print(f"Returning response: {resp}")
     return {
         'statusCode': 200,
-        'headers': {'Access-Control-Allow-Origin': '*'},
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS'
+        },
         'body': json.dumps(resp)
     }
 
 def lambda_handler(event, context):
     load_file()
-    print("EVENT RECEIVED:", json.dumps(event))
+    print("📥 Incoming event:", event)
 
-    try:
-        # Parse input JSON safely
-        if isinstance(event, dict) and 'body' in event:
-            body = json.loads(event['body']) if isinstance(event['body'], str) else event['body']
-        else:
-            print("Invalid event: Missing 'body'")
-            return return_response({'error': 'Invalid request format'})
+    # Support both direct and API Gateway invoke
+    if 'body' in event:
+        try:
+            body = json.loads(event['body'])
+        except Exception as e:
+            print("❌ Error parsing body:", e)
+            return return_response({'status': 'invalid_json'})
+    else:
+        body = event
 
-        print("Parsed body:", body)
+    hallticket = str(body.get('hallticket', '')).strip()
 
-        hallticket_raw = body.get('hallticket', None)
+    if not hallticket:
+        return return_response({'status': 'invalid_input', 'message': 'Hallticket is required'})
 
-        if hallticket_raw is None:
-            return return_response({'error': 'hallticket is required'})
+    student = cached_data.get(hallticket)
 
-        # Convert to string, strip, and ensure it’s a digit
-        hallticket_str = str(hallticket_raw).strip()
-
-        if not hallticket_str.isdigit():
-            return return_response({'error': 'hallticket must be a number'})
-
-        hallticket = int(hallticket_str)
-        print(f"Checking hallticket: {hallticket}")
-
-        if binary_search(cached_data, hallticket):
-            print(f"Hallticket {hallticket} found")
-            return return_response({'status': 'found'})
-        else:
-            print(f"Hallticket {hallticket} not found")
-            return return_response({'status': 'not_found'})
-
-    except Exception as e:
-        print(f"Exception: {e}")
-        return return_response({'error': 'Internal server error'})
+    if student:
+        print(f"✅ Hallticket {hallticket} found.")
+        return return_response({
+            'status': 'found',
+            'student': student
+        })
+    else:
+        print(f"❌ Hallticket {hallticket} not found.")
+        return return_response({'status': 'not_found'})
